@@ -14,10 +14,10 @@ pipeline {
         stage('Prepare Environment') {
             steps {
                 script {
-                    // Set npm cache to a user-accessible directory
-                    sh 'mkdir -p ~/.npm-global'
-                    sh 'npm config set prefix ~/.npm-global'
-                    sh 'export PATH=~/.npm-global/bin:$PATH'
+                    // Set npm global directory to a user-accessible directory within the workspace
+                    sh 'mkdir -p ${WORKSPACE}/.npm-global'
+                    sh 'npm config set prefix ${WORKSPACE}/.npm-global'
+                    sh 'export PATH=${WORKSPACE}/.npm-global/bin:$PATH'
                 }
             }
         }
