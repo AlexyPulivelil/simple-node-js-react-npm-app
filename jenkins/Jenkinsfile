@@ -7,25 +7,22 @@ pipeline {
     }
     environment {
         CI = 'true'
-        NPM_CONFIG_PREFIX = "${env.WORKSPACE}/.npm-global"
-        npm_config_cache = "${env.WORKSPACE}/.npm-cache"
-        npm_config_userconfig = "${env.WORKSPACE}/.npmrc"
-        PATH = "${env.WORKSPACE}/.npm-global/bin:$PATH"
+        NPM_CONFIG_PREFIX = "${WORKSPACE}/.npm-global"
+        npm_config_cache = "${WORKSPACE}/.npm-cache"
+        npm_config_userconfig = "${WORKSPACE}/.npmrc"
+        PATH = "${WORKSPACE}/.npm-global/bin:${PATH}"
     }
 
     stages {
         stage('Prepare Environment') {
             steps {
-                script {
-                    // Set npm global directory and config within the workspace
-                    sh 'mkdir -p ${env.NPM_CONFIG_PREFIX}'
-                    sh 'mkdir -p ${env.npm_config_cache}'
-                    sh 'echo "prefix = ${env.NPM_CONFIG_PREFIX}" > ${env.npm_config_userconfig}'
-                }
+                sh '''
+                    mkdir -p ${NPM_CONFIG_PREFIX}
+                    mkdir -p ${npm_config_cache}
+                    echo "prefix = ${NPM_CONFIG_PREFIX}" > ${npm_config_userconfig}
+                '''
             }
         }
-
-
         stage('Clean npm Cache') {
             steps {
                 sh 'npm cache clean --force'
