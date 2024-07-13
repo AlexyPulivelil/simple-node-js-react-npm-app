@@ -9,6 +9,22 @@ pipeline {
         CI = 'true'
     }
     stages {
+        stage('Fix Permissions') {
+            steps {
+                script {
+                    // Fix permissions for npm cache directory
+                    sh 'sudo chown -R $(whoami):$(whoami) ~/.npm || true'
+                    // Set npm cache to a user-accessible directory
+                    sh 'npm config set cache ~/.npm-cache --global'
+                }
+            }
+        }
+
+        stage('Clean npm Cache') {
+            steps {
+                sh 'npm cache clean --force'
+            }
+        }
         stage('Build') {
             steps {
                 sh 'npm install'
