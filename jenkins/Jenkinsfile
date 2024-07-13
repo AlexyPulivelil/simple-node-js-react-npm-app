@@ -7,15 +7,17 @@ pipeline {
     }
     environment {
         CI = 'true'
+        NPM_CONFIG_PREFIX = "${env.WORKSPACE}/.npm-global"
     }
+
     stages {
-        stage('Fix Permissions') {
+        stage('Prepare Environment') {
             steps {
                 script {
-                    // Fix permissions for npm cache directory
-                    sh 'sudo chown -R $(whoami):$(whoami) ~/.npm || true'
                     // Set npm cache to a user-accessible directory
-                    sh 'npm config set cache ~/.npm-cache --global'
+                    sh 'mkdir -p ~/.npm-global'
+                    sh 'npm config set prefix ~/.npm-global'
+                    sh 'export PATH=~/.npm-global/bin:$PATH'
                 }
             }
         }
