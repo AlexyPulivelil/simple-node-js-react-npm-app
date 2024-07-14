@@ -29,6 +29,55 @@ pipeline {
         DOCKER_HUB_REPO = 'techino'
     }
     stages {
+        stage('Pull and Build Images Locally') {
+            steps {
+                script {
+                    sh 'pwd && ls' 
+                    // Define images to pull and build locally
+                    def images = [
+                        'postgres:latest',
+                        'redis:latest',
+                        'mongo:latest',
+                        'mongo-express:latest'
+                    ]
+
+                    // Iterate through each image
+                    images.each { imageName ->
+                        // Pull the image using Kaniko
+                        sh """
+                            docker run --rm \
+                                -v /var/run/docker.sock:/kaniko/docker.sock \
+                                -v /root/.docker:/kaniko/.docker \
+                                -v /docker-jenkins:/workspace \
+                                ${KANIKO_IMAGE} \
+                                --dockerfile=/workspace/Dockerfile \
+                                --destination=${DOCKER_HUB_REPO}/${imageName}
+                        """
+                    }
+                }
+            }
+        }
+
+        stage('Push Images to Docker Hub') {
+            steps {
+                script {
+                    // Iterate again through each image for pushing
+                    def images = [
+                        'postgres:latest',
+                        'redis:latest',
+                        'mongo:latest',
+                        'mongo-express:latest'
+                    ]
+
+                    // Push each image to Docker Hub
+                    images.each { imageName ->
+                        sh "docker push ${DOCKER_HUB_REPO}/${imageName}"
+                    }
+                }
+            }
+        }
+    }
+}
         stage('Prepare Environment') {
             steps {
                 sh '''
