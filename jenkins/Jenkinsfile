@@ -29,43 +29,40 @@ pipeline {
         DOCKER_HUB_REPO = 'techino'
     }
     stages {
-        // stage('Install Docker') {
-        //             steps {
-        //                 sh '''
-        //                     apt-get update
-        //                     apt-get install -y docker.io
-        //                     systemctl start docker || true
-        //                     systemctl enable docker || true
-        //                 '''
-        //             }
-        //         }
         stage('Pull Images') {
-            agent none
-            steps {
-                script {
-                    docker.image('postgres:latest').pull()
-                    docker.image('redis:latest').pull()
-                    docker.image('mongo:latest').pull()
-                    docker.image('mongo-express:latest').pull()
+            agent {
+                docker {
+                    image 'docker:latest'
+                    args '--privileged -v /var/run/docker.sock:/var/run/docker.sock'
                 }
+            }
+            steps {
+                sh 'docker pull postgres:latest'
+                sh 'docker pull redis:latest'
+                sh 'docker pull mongo:latest'
+                sh 'docker pull mongo-express:latest'
             }
         }
         stage('Tag and Push Images') {
-            agent none
-            steps {
-                script {
-                    docker.image('postgres:latest').tag("${DOCKER_HUB_REPO}/postgres:latest")
-                    docker.image('redis:latest').tag("${DOCKER_HUB_REPO}/redis:latest")
-                    docker.image('mongo:latest').tag("${DOCKER_HUB_REPO}/mongo:latest")
-                    docker.image('mongo-express:latest').tag("${DOCKER_HUB_REPO}/mongo-express:latest")
-
-                    docker.withRegistry('https://index.docker.io/v1/', 'docker-hub-credentials') {
-                        docker.image("${DOCKER_HUB_REPO}/postgres:latest").push()
-                        docker.image("${DOCKER_HUB_REPO}/redis:latest").push()
-                        docker.image("${DOCKER_HUB_REPO}/mongo:latest").push()
-                        docker.image("${DOCKER_HUB_REPO}/mongo-express:latest").push()
-                    }
+            agent {
+                docker {
+                    image 'docker:latest'
+                    args '--privileged -v /var/run/docker.sock:/var/run/docker.sock'
                 }
+            }
+            steps {
+                sh '''
+                    docker tag postgres:latest ${DOCKER_HUB_REPO}/postgres:latest
+                    docker tag redis:latest ${DOCKER_HUB_REPO}/redis:latest
+                    docker tag mongo:latest ${DOCKER_HUB_REPO}/mongo:latest
+                    docker tag mongo-express:latest ${DOCKER_HUB_REPO}/mongo-express:latest
+
+                    docker login -u $DOCKER_HUB_USERNAME -p $DOCKER_HUB_PASSWORD
+                    docker push ${DOCKER_HUB_REPO}/postgres:latest
+                    docker push ${DOCKER_HUB_REPO}/redis:latest
+                    docker push ${DOCKER_HUB_REPO}/mongo:latest
+                    docker push ${DOCKER_HUB_REPO}/mongo-express:latest
+                '''
             }
         }
         stage('Prepare Environment') {
