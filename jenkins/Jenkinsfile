@@ -1,18 +1,51 @@
 pipeline {
+    // agent {
+    //     docker {
+    //         image 'node:lts-buster-slim'
+    //         args '-p 3004:3004'
+    //     }
+    // }
+    // environment {
+    //     CI = 'true'
+    // }
+
+    // stages {
+    //     stage('Build') {
+    //         steps {
+    //             sh 'npm install'
+    //         }
+    //     }
     agent {
         docker {
             image 'node:lts-buster-slim'
-            args '-p 3004:3004'
+            args '-u root -p 3004:3004'
         }
     }
     environment {
-        CI = 'true'
+        NPM_CONFIG_PREFIX = "/root/.npm-global"
+        npm_config_cache = "/root/.npm-cache"
+        npm_config_userconfig = "/root/.npmrc"
+        PATH = "/root/.npm-global/bin:$PATH"
     }
-
     stages {
-        stage('Build') {
+        stage('Prepare Environment') {
             steps {
-                sh 'npm install'
+                sh '''
+                    mkdir -p ${NPM_CONFIG_PREFIX}
+                    mkdir -p ${npm_config_cache}
+                    echo "prefix = ${NPM_CONFIG_PREFIX}" > ${npm_config_userconfig}
+                '''
+            }
+        }
+        stage('Clean Workspace') {
+            steps {
+                sh 'rm -rf node_modules'
+                sh 'npm cache clean --force'
+            }
+        }
+        stage('Install Dependencies') {
+            steps {
+                sh 'npm install --loglevel verbose'
             }
         }
         stage('Test') {
