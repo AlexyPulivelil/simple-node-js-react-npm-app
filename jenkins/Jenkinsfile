@@ -29,42 +29,6 @@ pipeline {
         DOCKER_HUB_REPO = 'techino'
     }
     stages {
-        stage('Pull Images') {
-            agent {
-                docker {
-                    image 'docker:latest'
-                    args '--privileged -v /var/run/docker.sock:/var/run/docker.sock'
-                }
-            }
-            steps {
-                sh 'docker pull postgres:latest'
-                sh 'docker pull redis:latest'
-                sh 'docker pull mongo:latest'
-                sh 'docker pull mongo-express:latest'
-            }
-        }
-        stage('Tag and Push Images') {
-            agent {
-                docker {
-                    image 'docker:latest'
-                    args '--privileged -v /var/run/docker.sock:/var/run/docker.sock'
-                }
-            }
-            steps {
-                sh '''
-                    docker tag postgres:latest ${DOCKER_HUB_REPO}/postgres:latest
-                    docker tag redis:latest ${DOCKER_HUB_REPO}/redis:latest
-                    docker tag mongo:latest ${DOCKER_HUB_REPO}/mongo:latest
-                    docker tag mongo-express:latest ${DOCKER_HUB_REPO}/mongo-express:latest
-
-                    docker login -u $DOCKER_HUB_USERNAME -p $DOCKER_HUB_PASSWORD
-                    docker push ${DOCKER_HUB_REPO}/postgres:latest
-                    docker push ${DOCKER_HUB_REPO}/redis:latest
-                    docker push ${DOCKER_HUB_REPO}/mongo:latest
-                    docker push ${DOCKER_HUB_REPO}/mongo-express:latest
-                '''
-            }
-        }
         stage('Prepare Environment') {
             steps {
                 sh '''
