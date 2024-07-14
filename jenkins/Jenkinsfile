@@ -29,17 +29,16 @@ pipeline {
         DOCKER_HUB_REPO = 'techino'
     }
     stages {
-        stage('Prepare Docker') {
-            steps {
-                sh '''
-                    apt-get update
-                    apt-get install -y docker.io
-                    usermod -aG docker jenkins
-                    systemctl start docker
-                    systemctl enable docker
-                '''
-            }
-        }
+        stage('Install Docker') {
+                    steps {
+                        sh '''
+                            apt-get update
+                            apt-get install -y docker.io
+                            systemctl start docker || true
+                            systemctl enable docker || true
+                        '''
+                    }
+                }
         stage('Pull Images') {
             steps {
                 script {
