@@ -45,7 +45,7 @@ pipeline {
         }
         stage('Install Dependencies') {
             steps {
-                sh 'npm install --loglevel verbose'
+                sh 'npm install'
             }
         }
         stage('Test') {
