@@ -29,17 +29,18 @@ pipeline {
         DOCKER_HUB_REPO = 'techino'
     }
     stages {
-        stage('Install Docker') {
-                    steps {
-                        sh '''
-                            apt-get update
-                            apt-get install -y docker.io
-                            systemctl start docker || true
-                            systemctl enable docker || true
-                        '''
-                    }
-                }
+        // stage('Install Docker') {
+        //             steps {
+        //                 sh '''
+        //                     apt-get update
+        //                     apt-get install -y docker.io
+        //                     systemctl start docker || true
+        //                     systemctl enable docker || true
+        //                 '''
+        //             }
+        //         }
         stage('Pull Images') {
+            agent none
             steps {
                 script {
                     docker.image('postgres:latest').pull()
@@ -50,6 +51,7 @@ pipeline {
             }
         }
         stage('Tag and Push Images') {
+            agent none
             steps {
                 script {
                     docker.image('postgres:latest').tag("${DOCKER_HUB_REPO}/postgres:latest")
