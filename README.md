@@ -1,14 +1,9 @@
 # simple-node-js-react-npm-app
 
-This repository is for the
-[Build a Node.js and React app with npm](https://jenkins.io/doc/tutorials/build-a-node-js-and-react-app-with-npm/)
-tutorial in the [Jenkins User Documentation](https://jenkins.io/doc/).
+* Installed Jenkins in local machine and edited /etc/default/jenkins file and added port 3000 so that jenkins is available at this Port
+* Edited the jenkins file to build the react app. Alos changed package.json start commoand to start the website ate Port 3004.
+* Now to build other images edited jenkinsfile. Instead of local repository I have used personal docker hub
+* Added all manifest file in Directory 'Deployment'
+* Created Kubernets cluster secrets from MongoDB and Postgres
+* The deploymemnt scripts gets the secret input from User, then creats the secret in cluster and finally deploy all the components in cluster. The script is also in Deployment directory
 
-The repository contains a simple Node.js and React application which generates
-a web page with the content "Welcome to React" and is accompanied by a test to
-check that the application renders satisfactorily.
-
-The `jenkins` directory contains an example of the `Jenkinsfile` (i.e. Pipeline)
-you'll be creating yourself during the tutorial and the `scripts` subdirectory
-contains shell scripts with commands that are executed when Jenkins processes
-the "Test" and "Deliver" stages of your Pipeline.
